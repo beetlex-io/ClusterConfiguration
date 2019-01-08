@@ -1,0 +1,504 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+
+    <link href="/css/bootstrap.css" rel="stylesheet" />
+    <link href="/css/bootstrap-theme.css" rel="stylesheet" />
+    <script src="/js/jquery.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="/js/ModuleLoader.js"></script>
+    <script src="/js/FastHttpApi.js"></script>
+    <script src="/js/Controller.js"></script>
+    <script src="/js/Monitor.js"></script>
+    <title>WebApi Cluster Configuration</title>
+    <style>
+        a {
+            text-decoration: none
+        }
+
+            a:link {
+                text-decoration: none;
+            }
+
+            a:visited {
+                text-decoration: none;
+            }
+
+            a:hover {
+                text-decoration: none;
+            }
+
+            a:active {
+                text-decoration: none;
+            }
+
+        .valueLabel {
+            font-weight: bold;
+        }
+
+        .navbar a {
+            color: white;
+        }
+    </style>
+
+</head>
+<body style="background-color:black">
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container" slot="header">
+
+        </div>
+    </div>
+    <div class="container bs-docs-container" style="padding-top:40px;">
+        <!--<ul class="nav nav-tabs" slot="admin-manager-nav"></ul>-->
+        <br />
+        <div class="row">
+            <div class="col-md-2" style="margin:2px;padding:2px;">
+                <div class="panel panel-default" style="border:none; background-color:#e4e4e4; box-shadow: 1px 1px 5px rgba(255, 255, 255, 0.9);">
+                    <div class="panel-body">
+                        <h4 style="margin:0px;">Clusters</h4>
+                        <hr style="margin:4px;border-color:white" />
+
+                        <div id="lstClusters">
+                            <ul class="list-group">
+                                <li class="list-group-item" v-for="item in Data" style="padding:4px;">
+                                    <img src="images/icon_node-small.png" style="width:16px;" />
+                                    <a style="margin-left:2px;" href="javascript:void(0)" :title="item.Remark" v-on:click="SelectClusters(item)">{{item.Name}}({{item.Count}})</a>
+                                    <a style="float:right;" href="javascript:void(0)" v-on:click="deleteCluster(item.Name)"><img style="height:16px;" src="images/delete.png" /></a>
+                                </li>
+                            </ul>
+
+                        </div>
+                        <hr style="margin:4px;border-color:white" />
+                        <form>
+                            <div class="form-group-sm">
+                                <label for="exampleInputEmail1">Name</label>
+                                <input type="text" id="cname" class="form-control" placeholder="name">
+                            </div>
+                            <div class="form-group-sm">
+                                <label for="exampleInputPassword1">Remark</label>
+                                <input type="text" id="cremark" class="form-control" placeholder="remark">
+                            </div>
+                            <hr style="margin:4px;" />
+                            <button type="button" onclick="addCluster()" style="float:right;" class="btn btn-sm btn-default">Create</button>
+                            <div style="clear:both;"></div>
+                        </form>
+                        <hr style="margin:4px;border-color:white" />
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5" style="margin:2px;padding:2px;margin-left:20px;margin-right:20px;">
+                <div class="panel panel-default" style="box-shadow: 1px 1px 5px rgba(255, 255, 255, 0.9);border:none;">
+                    <div class="panel-body">
+                        <h4 style="margin:0px;">Cluster api hosts:<span id="titleName"></span></h4>
+                        <hr style="margin:4px;" />
+                        <form class="form-inline form-group-sm">
+                            <a href="javascript:void(0)" onclick="$('[url_panel]').hide()"> <img src="images/hidetab.png" /></a>
+                            <div class="form-group">
+                                <label>Url</label>
+                                <input type="text" class="form-control" id="urlName" style="width:140px;" placeholder="sample:/orders/.*" />
+                            </div>
+                            <div class="form-group">
+
+                                <input type="email" class="form-control" id="urlRemark" style="width:160px;" placeholder="remark" />
+                            </div>
+                            <button type="button" onclick="addurl()" class="btn btn-sm btn-default">Add</button>
+                        </form>
+                        <hr style="margin:4px;" />
+                        <div id="lstUrls">
+                            <ul style="padding-left:0px;list-style:none;">
+                                <li v-for="item in Data" style="border-style:solid;border-width:1px;border-color:#c7c7c7;border-radius:4px;padding:4px;margin-bottom:10px;">
+                                    <div style="padding:4px;padding-bottom:8px; margin-bottom:4px;margin-top:4px;border-radius:4px;background-color:#e4e4e4">
+                                        <a href="javascript:void(0)" v-on:click="delUrl(item.Name)"><img style="height:16px;" src="images/delete.png" /></a>
+
+                                        <a v-on:click="$('#'+item.ID+'_panel').toggle()" href="javascript:void(0)"><span><b> {{item.Name}} ({{item.Remark}})</b></span></a>
+                                        <div style="float:right">
+                                            <span class="label label-default"><img src="/images/count.png" /> {{item.RequestPer}}/s (total:{{item.TotalRequest}})</span>
+                                        </div>
+                                        <div style="clear:both;">
+                                        </div>
+                                    </div>
+                                    <div v-bind:id="[item.ID+'_panel']" url_panel="url_panel">
+
+                                        <form class="form-inline form-group-sm" style="padding-left:20px;">
+                                            <div class="form-group">
+                                                <input v-bind:id="[item.ID+'_host']" class="form-control" style="min-width:200px;" type="text" placeholder="http://hostname:port" />
+                                                <img src="images/weight.png" /><input v-bind:id="[item.ID+'_weight']" class="form-control" type="number" value="0" style="width:60px;" max="10" min="0" />
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-default" v-on:click="addHost(item.ID,item.Name)">Add</button>
+                                        </form>
+                                        <ul style="list-style:none;padding-left:20px;padding-bottom:6px;">
+                                            <li v-for="host in item.Hosts" style="margin-top:4px;">
+                                                <div style="padding:4px;margin-bottom:4px;border-bottom:solid;border-bottom-color:#c7c7c7;border-bottom-width:1px;">
+
+                                                    <div>
+                                                        <div style="float:left;padding-top:6px;">
+                                                            <a href="javascript:void(0)" v-on:click="delHost(item.Name, host.Name)"><img style="height:16px;" src="images/delete.png" /></a>
+                                                            <img v-if="host.Available" src="images/server.png" />
+                                                            <img v-else src="images/server_error.png" />
+                                                            <a href="javascript:void(0)" v-on:click="selectHost(host.Name)"><b> {{host.Name}}</b></a>
+
+
+                                                        </div>
+                                                        <div style="float:right;">
+
+                                                            <span>Weighed:</span>
+                                                            <input v-bind:id="host.ID" type="number" v-model:value="host.Weight" v-on:change="updateWeight(item.Name, host)"
+                                                                   class="form-control" style="width:60px;display:initial" max="10" min="0" />
+                                                            <!--<span>Max rps:</span>
+                                                            <input type="number" v-model:value="host.MaxRPS" class="form-control form-group-sm" style="text-align:right;width:100px;display:initial" min="0" max="100000" />-->
+                                                            <a href="javascript:void(0)" class="btn btn-sm btn-default" v-on:click="updateHost(item.Name,host)">save</a>
+                                                        </div>
+                                                        <div style="clear:both;padding-left:40px;">
+
+                                                        </div>
+                                                    </div>
+                                                    <div style="display:inline-block;width:100%;padding-top:6px;">
+                                                        <span class="label label-default" style="float:right;margin-left:4px;"><img src="/images/count.png" /> {{host.RequestPer}}/s (total:{{host.TotalRequest}})</span>
+                                                        <span class="label label-info" style="float:right;margin-left:4px;"><img src="/images/memory.png" /> {{host.Memory}}MB</span>
+                                                        <span class="label label-success" style="float:right;margin-left:4px;"><img src="/images/cpu.png" /> {{host.Cpu}}%</span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+
+                                    </div>
+                                </li>
+                            </ul>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4" style="margin:2px;padding:2px;">
+                <div class="panel panel-default" style="background-color:#e4e4e4;box-shadow: 1px 1px 5px rgba(255, 255, 255, 0.9);border:none;">
+                    <div class="panel-body">
+                        <h4 style="margin:0px;"> Monitor:<span id="hostName"></span></h4>
+                        <hr style="margin:4px;border-color:white" />
+
+
+                        <div id="serverInfo" style="display:none;">
+                            <div class="panel-body" style="height:60px;padding:1px;">
+                                <canvas width="400" height="70" id="cpuCanavas" style="width:100%;height:100%;"></canvas>
+                            </div>
+
+                            <div class="panel-body" style="height:60px;padding:1px;">
+                                <canvas width="400" height="70" id="requestCanvas" style="width:100%;height:100%;"></canvas>
+                            </div>
+
+                            <div class="panel-body" style="height:60px;padding:1px;">
+                                <canvas width="400" height="70" id="networkCanvas" style="width:100%;height:100%;"></canvas>
+                            </div>
+                            <br />
+
+                            <h4 style="margin:0px;">Details</h4>
+                            <hr style="margin:4px;border-color:white" />
+
+                            <p class="pline">
+                                <span class="valueLabel">Server name:</span>
+                                <span class="badge ">{{Data.ServerName}}</span>
+                            </p>
+                            <hr style="margin:4px;border-color:white" />
+                            <p class="pline">
+                                <span class="valueLabel">Host:</span>
+                                <span class="badge">{{Data.Host}}@{{Data.Port}}</span>
+                                <span class="valueLabel">Run time:</span>
+                                <span class="badge ">{{Data.RunTime}}</span>
+                            </p>
+                            <hr style="margin:4px;border-color:white" />
+                            <p class="pline">
+                                <span class="valueLabel">CPU:</span>
+                                <span class="badge">{{Data.Cpu}}%</span>
+
+                                <span class="valueLabel">Memory:</span>
+                                <span class="badge ">{{Data.Memory}}KB</span>
+                            </p>
+                            <hr style="margin:4px;border-color:white" />
+                            <p class="pline">
+                                <span class="valueLabel">Connection accept:</span>
+                                <span class="badge ">{{Data.ConnectionsPer}}/s</span>
+                                <span class="valueLabel">alive:</span>
+                                <span class="badge ">{{Data.CurrentConnectinos}}</span>
+                                <span class="valueLabel">total: </span>
+                                <span class="badge ">{{Data.TotalConnections}}</span>
+
+                            </p>
+                            <hr style="margin:4px;border-color:white" />
+                            <p class="pline">
+                                <span class="valueLabel">Request:</span>
+                                <span class="badge "> {{Data.RequestPer}}/s</span>
+                                <span class="valueLabel">total:</span>
+                                <span class="badge ">{{Data.TotalRequest}}</span>
+                            </p>
+                            <hr style="margin:4px;border-color:white" />
+                            <p class="pline">
+                                <span class="valueLabel">Receive:</span>
+                                <span class="badge ">{{Data.ReceiveBytesPer}}MB/s</span>
+                                <span class="valueLabel">total:</span>
+                                <span class="badge ">{{Data.TotalReceiveBytes}}MB</span>
+                            </p>
+                            <hr style="margin:4px;border-color:white" />
+
+                            <p>
+                                <span class="valueLabel">Send:</span>
+                                <span class="badge ">{{Data.SendBytesPer}}MB/s</span>
+                                <span class="valueLabel">total:</span>
+                                <span class="badge ">{{Data.TotalSendBytes}}MB</span>
+                            </p>
+                            <br />
+                            <h4 style="margin:0px;">Actions</h4>
+                            <hr style="margin:4px;border-color:white" />
+
+                            <ul style="padding-left:20px;">
+                                <li v-for="item in Data.Actions" style="padding:4px;">
+                                    <div :title="item.Url" style="float:left;overflow: hidden; white-space: nowrap; text-overflow: ellipsis; display:block;width:150px;">
+                                        <span>{{item.Url}}</span>
+                                    </div>
+                                    <div style="float:right;">
+                                        <span class="label label-default"><img src="/images/count.png" /> {{item.RequestsPer}}/s (total:{{item.Requests}})</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <br />
+    <br />
+    <br />
+    <br />
+    <div class="navbar navbar-inverse navbar-fixed-bottom">
+        <div class="container" style="color:aliceblue;text-align:center;" slot="footer">
+        </div>
+    </div>
+
+
+
+    <script>
+        var lstClusters;
+        var selectCluster;
+        var lstUrls;
+        var _hostid = 0;
+        var Version;
+        var host;
+
+        //Monitor
+        var cpuMonitor;
+        var cpu;
+        var requestMonitor;
+        var request;
+        var networkMonitor;
+        var netInput;
+        var netOutput;
+        var serverInfoControl;
+        serverInfoControl = new Vue({
+            el: '#serverInfo',
+            data: {
+                Data: {}
+            }
+        });
+
+        $(document).ready(function () {
+            lstClusters = new Vue({ el: '#lstClusters', data: { Data: [] } });
+            lstUrls = new Vue({ el: '#lstUrls', data: { Data: [] } });
+            listClusters();
+            setInterval(function () { listUrls(); }, 1000);
+            setInterval(function () { GetServerInfo(); }, 1000);
+
+        });
+
+        function GetServerInfo() {
+            if (host) {
+                Configuration_GetHostStatus(selectCluster.Name, host).execute(function (result) {
+                    serverInfoControl.Data = result.Data;
+                    cpu.push(result.Data.Cpu);
+                    cpuMonitor.draw();
+                    request.push(result.Data.RequestPer);
+                    requestMonitor.draw();
+
+                    netInput.push(result.Data.ReceiveBytesPer);
+                    netOutput.push(result.Data.SendBytesPer);
+                    networkMonitor.draw();
+                });
+            }
+        }
+
+        function listClusters() {
+            selectCluster = null;
+            $('#titleName').text('');
+
+            Configuration_ListCluster().execute(function (result) {
+                selectCluster = null;
+                lstClusters.Data = result.Data;
+                lstUrls.Data = [];
+            });
+        }
+        function addCluster() {
+            var name = $('#cname').val();
+            var cremark = $('#cremark').val();
+            if (!name) {
+                alert("enter the cluster name");
+                return;
+            }
+            if (!cremark) {
+                alert("enter the cluster remark");
+                return;
+            }
+            Configuration_CreateCluster(name, cremark).execute(function (result) {
+                $('#cname').val('');
+                $('#cremark').val('');
+                listClusters();
+            });
+        }
+        function deleteCluster(name) {
+            if (confirm('Do you want to delete ' + name + ' ?')) {
+                Configuration_DelCluster(name).execute(function (result) {
+                    listClusters();
+                });
+            }
+        }
+        function selectHost(name) {
+            host = name;
+            $('#hostName').text(name);
+            $('#serverInfo').show();
+            cpuMonitor = new Monitor('cpuCanavas');
+            cpu = cpuMonitor.create();
+            cpu.label = "Cpu";
+            requestMonitor = new Monitor('requestCanvas');
+            request = requestMonitor.create();
+            request.maxValue = 100000;
+            request.changeMaxValue = true;
+            request.label = "Request";
+
+            networkMonitor = new Monitor('networkCanvas');
+            netInput = networkMonitor.create();
+            netInput.maxValue = 100;
+            netInput.label = "Network Input(MB)";
+
+            netOutput = networkMonitor.create();
+            netOutput.maxValue = 100;
+            netOutput.label = "Network Output(MB)";
+            GetServerInfo();
+
+
+        }
+        function SelectClusters(item) {
+            if (selectCluster == null || selectCluster.Name != item.Name) {
+                host = null;
+                Version = null;
+                $('#hostName').text('');
+                $('#serverInfo').hide();
+                serverInfoControl.Data = {};
+                $('#titleName').text(item.Name);
+                selectCluster = item;
+                lstUrls.Data = [];
+                listUrls();
+            }
+        }
+        function updateHost(url, host) {
+            Configuration_UpateHost(selectCluster.Name, url, host.Name, host.Weight, host.MaxRPS).execute(function (result) {
+                alert('Data has been saved!');
+            });
+        }
+        function addurl() {
+            if (!selectCluster) {
+                alert('choose a cluster!');
+                return;
+            }
+            var name = $('#urlName').val();
+            var remark = $('#urlRemark').val();
+            if (!name) {
+                alert("enter the Webapi url");
+                return;
+            }
+            if (!remark) {
+                alert("enter the Webapi remark");
+                return;
+            }
+            Configuration_AddUrl(selectCluster.Name, name, remark).execute(function (result) {
+                $('#urlName').val('');
+                $('#urlRemark').val('');
+                listUrls();
+            });
+        }
+
+        function findItem(id) {
+            for (i = 0; i < lstUrls.Data.length; i++) {
+                for (k = 0; k < lstUrls.Data[i].Hosts.length; k++) {
+                    if (lstUrls.Data[i].Hosts[k].ID == id)
+                        return lstUrls.Data[i].Hosts[k];
+                }
+            }
+            return null;
+        }
+        function listUrls() {
+            if (selectCluster) {
+                Configuration_GetClusterInfo(selectCluster.Name).execute(function (result) {
+                    //lstUrls.Data = result.Data.Urls;
+                    if (Version != result.Data.Version) {
+                        lstUrls.Data = result.Data.Urls;
+                        Version = result.Data.Version;
+                    }
+                    else {
+                        for (i = 0; i < result.Data.Urls.length; i++) {
+                            lstUrls.Data[i].RequestPer = result.Data.Urls[i].RequestPer;
+                            lstUrls.Data[i].TotalRequest = result.Data.Urls[i].TotalRequest;
+                            for (k = 0; k < result.Data.Urls[i].Hosts.length; k++) {
+                                var host = result.Data.Urls[i].Hosts[k];
+                                var item = findItem(host.ID);
+                                if (item) {
+                                    item.Available = host.Available;
+                                    item.Cpu = host.Cpu;
+                                    item.Memory = host.Memory;
+                                    item.RequestPer = host.RequestPer;
+                                    item.TotalRequest = host.TotalRequest;
+                                }
+                                //RequestPer
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function delUrl(name) {
+            if (confirm('Do you want to delete ' + name + ' webapi config?')) {
+                Configuration_DelUrl(selectCluster.Name, name).execute(function (result) {
+                    listUrls();
+                });
+            }
+        }
+
+        function addHost(id, url) {
+            var host = $('#' + id + '_host').val();
+            var weight = $('#' + id + '_weight').val();
+            if (!host) {
+                alert("enter the host address")
+                return;
+            }
+            Configuration_AddHost(selectCluster.Name, url, host, weight).execute(function (result) {
+                $('#' + id + '_host').val('');
+                $('#' + id + '_weight').val('0');
+                listUrls();
+            });
+        }
+
+        function delHost(url, host) {
+            if (confirm('Do you want to delete ' + url + ' webapi ' + host + ' host?')) {
+                Configuration_DelHost(selectCluster.Name, url, host).execute(function (result) {
+                    listUrls();
+                });
+            }
+        }
+
+    </script>
+</body>
+
+</html>

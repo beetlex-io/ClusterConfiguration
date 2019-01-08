@@ -1,0 +1,136 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <Copyright>Copyright © ikende.com 2018 email:henryfan@msn.com</Copyright>
+    <Product>WebApi Cluster Configuration</Product>
+    <Authors>henryfan</Authors>
+    <Version>0.5</Version>
+    <Company>ikende.com</Company>
+    <PackageId>BeetleX.WebApiClusterConfiguration</PackageId>
+    <PackageLicenseUrl>https://github.com/IKende/ClusterConfiguration/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/IKende/ClusterConfiguration</PackageProjectUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="views\css\bootstrap-theme.css" />
+    <None Remove="views\css\bootstrap.css" />
+    <None Remove="views\favicon.ico" />
+    <None Remove="views\fonts\glyphicons-halflings-regular.eot" />
+    <None Remove="views\fonts\glyphicons-halflings-regular.svg" />
+    <None Remove="views\fonts\glyphicons-halflings-regular.ttf" />
+    <None Remove="views\fonts\glyphicons-halflings-regular.woff" />
+    <None Remove="views\fonts\glyphicons-halflings-regular.woff2" />
+    <None Remove="views\images\count.png" />
+    <None Remove="views\images\cpu.png" />
+    <None Remove="views\images\delete.png" />
+    <None Remove="views\images\hidetab.png" />
+    <None Remove="views\images\icon_node-small.png" />
+    <None Remove="views\images\memory.png" />
+    <None Remove="views\images\server.png" />
+    <None Remove="views\images\server_error.png" />
+    <None Remove="views\images\update.png" />
+    <None Remove="views\images\webapi.png" />
+    <None Remove="views\images\weight.png" />
+    <None Remove="views\index.html" />
+    <None Remove="views\js\bootstrap.js" />
+    <None Remove="views\js\Controller.js" />
+    <None Remove="views\js\FastHttpApi.js" />
+    <None Remove="views\js\jquery.js" />
+    <None Remove="views\js\md5.js" />
+    <None Remove="views\js\ModuleLoader.js" />
+    <None Remove="views\js\Monitor.js" />
+    <None Remove="views\js\vue.js" />
+    <None Remove="views\Login.html" />
+    <None Remove="views\PublicModule.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="views\css\bootstrap-theme.css">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="views\css\bootstrap.css">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="views\favicon.ico" />
+    <EmbeddedResource Include="views\fonts\glyphicons-halflings-regular.eot">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="views\fonts\glyphicons-halflings-regular.svg">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="views\fonts\glyphicons-halflings-regular.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="views\fonts\glyphicons-halflings-regular.woff">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="views\fonts\glyphicons-halflings-regular.woff2">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="views\images\count.png" />
+    <EmbeddedResource Include="views\images\cpu.png" />
+    <EmbeddedResource Include="views\images\delete.png" />
+    <EmbeddedResource Include="views\images\hidetab.png" />
+    <EmbeddedResource Include="views\images\icon_node-small.png" />
+    <EmbeddedResource Include="views\images\memory.png" />
+    <EmbeddedResource Include="views\images\server.png" />
+    <EmbeddedResource Include="views\images\server_error.png" />
+    <EmbeddedResource Include="views\images\update.png" />
+    <EmbeddedResource Include="views\images\webapi.png" />
+    <EmbeddedResource Include="views\images\weight.png" />
+    <EmbeddedResource Include="views\index.html">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="views\js\bootstrap.js">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="views\js\Controller.js" />
+    <EmbeddedResource Include="views\js\FastHttpApi.js" />
+    <EmbeddedResource Include="views\js\jquery.js">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="views\js\md5.js">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="views\js\ModuleLoader.js">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="views\js\Monitor.js">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="views\js\vue.js" />
+    <EmbeddedResource Include="views\Login.html">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="views\PublicModule.html">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BeetleX.FastHttpApi" Version="1.2.2" />
+    <PackageReference Include="BeetleX.FastHttpApi.Admin" Version="0.7.6" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Codes\Controller.cs">
+      <Generator>JSAPI</Generator>
+      <LastGenOutput>Controller.js</LastGenOutput>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Codes\Controller.js">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Controller.cs</DependentUpon>
+    </None>
+    <None Update="HttpConfig.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
