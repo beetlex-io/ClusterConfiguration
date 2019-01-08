@@ -1,4 +1,4 @@
-# ClusterConfiguration
+# Cluster configuration
 Beetlex Webapi cluster configuration
 
 ## run
